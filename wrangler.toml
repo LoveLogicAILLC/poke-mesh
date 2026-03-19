@@ -1,40 +1,57 @@
-# Cloudflare Workers configuration
-# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
-
-# Replace with your worker's name (kebab-case, no spaces)
 name = "poke-mesh"
-
-compatibility_date = "2026-03-19"
-
-# Entry point
 main = "src/index.ts"
+compatibility_date = "2026-03-19"
+compatibility_flags = ["nodejs_compat"]
 
-# Set to true if deploying to Cloudflare Workers (vs. Node runtime)
-# workers_dev = true
+# Development
+[dev]
+port = 3000
+local_protocol = "http"
 
-# ── Environment variables ─────────────────────────────────────────────────────
-# [vars]
-# MY_VAR = "value"
+# Environment variables
+[vars]
+MESH_GOSSIP_INTERVAL_MS = "5000"
+MESH_MAX_AGENTS = "100"
+LOG_LEVEL = "info"
 
-# ── KV Namespaces ─────────────────────────────────────────────────────────────
-# [[kv_namespaces]]
-# binding = "MY_KV"
-# id = "<KV_NAMESPACE_ID>"
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "poke-mesh-db"
+database_id = "PLACEHOLDER_D1_ID"
 
-# ── R2 Buckets ────────────────────────────────────────────────────────────────
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+# KV Namespace for mesh state cache
+[[kv_namespaces]]
+binding = "MESH_CACHE"
+id = "PLACEHOLDER_KV_ID"
 
-# ── D1 Databases ──────────────────────────────────────────────────────────────
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "my-database"
-# database_id = "<D1_DATABASE_ID>"
+# Staging environment
+[env.staging]
+name = "poke-mesh-staging"
+[env.staging.vars]
+LOG_LEVEL = "debug"
 
-# ── Environments ──────────────────────────────────────────────────────────────
-# [env.staging]
-# name = "your-worker-name-staging"
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "poke-mesh-db-staging"
+database_id = "PLACEHOLDER_STAGING_D1_ID"
 
-# [env.production]
-# name = "your-worker-name-production"
+[[env.staging.kv_namespaces]]
+binding = "MESH_CACHE"
+id = "PLACEHOLDER_STAGING_KV_ID"
+
+# Production environment
+[env.production]
+name = "poke-mesh"
+[env.production.vars]
+LOG_LEVEL = "warn"
+MESH_MAX_AGENTS = "1000"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "poke-mesh-db-production"
+database_id = "PLACEHOLDER_PROD_D1_ID"
+
+[[env.production.kv_namespaces]]
+binding = "MESH_CACHE"
+id = "PLACEHOLDER_PROD_KV_ID"
