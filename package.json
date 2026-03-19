@@ -1,0 +1,26 @@
+{
+  "name": "@lovelogicai/poke-mesh",
+  "version": "0.1.0",
+  "description": "Edge-native agent mesh networking for the Agentic Web",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "test": "bun test",
+    "lint": "bunx biome check --apply .",
+    "lint:ci": "bunx biome ci .",
+    "type-check": "bunx tsc --noEmit",
+    "deploy": "bunx wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.99.0"
+  }
+}
