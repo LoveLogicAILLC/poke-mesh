@@ -6,20 +6,28 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
     "test": "bun test",
-    "lint": "bunx biome check --apply .",
+    "lint": "bunx biome check --write .",
     "lint:ci": "bunx biome ci .",
     "type-check": "bunx tsc --noEmit",
-    "deploy": "bunx wrangler deploy"
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply poke-mesh-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply poke-mesh-db --remote",
+    "db:studio": "bunx drizzle-kit studio"
   },
   "dependencies": {
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "drizzle-orm": "^0.38.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@cloudflare/workers-types": "^4.20241205.0",
+    "drizzle-kit": "^0.30.0",
     "typescript": "^5.7.2",
     "wrangler": "^3.99.0"
   }

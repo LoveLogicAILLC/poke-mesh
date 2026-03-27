@@ -1,0 +1,82 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "0000",
+  "prevId": "",
+  "tables": {
+    "agents": {
+      "name": "agents",
+      "columns": {
+        "id": { "name": "id", "type": "text", "primaryKey": true, "notNull": true },
+        "name": { "name": "name", "type": "text", "primaryKey": false, "notNull": true },
+        "address": { "name": "address", "type": "text", "primaryKey": false, "notNull": true },
+        "public_key": { "name": "public_key", "type": "text", "primaryKey": false, "notNull": false },
+        "status": { "name": "status", "type": "text", "primaryKey": false, "notNull": true, "default": "'active'" },
+        "last_heartbeat": { "name": "last_heartbeat", "type": "integer", "primaryKey": false, "notNull": false },
+        "metadata": { "name": "metadata", "type": "text", "primaryKey": false, "notNull": false },
+        "created_at": { "name": "created_at", "type": "integer", "primaryKey": false, "notNull": true },
+        "updated_at": { "name": "updated_at", "type": "integer", "primaryKey": false, "notNull": true }
+      },
+      "indexes": {
+        "agents_status_idx": { "name": "agents_status_idx", "columns": ["status"], "isUnique": false }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "messages": {
+      "name": "messages",
+      "columns": {
+        "id": { "name": "id", "type": "text", "primaryKey": true, "notNull": true },
+        "from_agent_id": { "name": "from_agent_id", "type": "text", "primaryKey": false, "notNull": true },
+        "to_agent_id": { "name": "to_agent_id", "type": "text", "primaryKey": false, "notNull": false },
+        "type": { "name": "type", "type": "text", "primaryKey": false, "notNull": true },
+        "payload": { "name": "payload", "type": "text", "primaryKey": false, "notNull": true },
+        "ttl": { "name": "ttl", "type": "integer", "primaryKey": false, "notNull": true, "default": 3 },
+        "status": { "name": "status", "type": "text", "primaryKey": false, "notNull": true, "default": "'pending'" },
+        "created_at": { "name": "created_at", "type": "integer", "primaryKey": false, "notNull": true }
+      },
+      "indexes": {
+        "messages_from_agent_idx": { "name": "messages_from_agent_idx", "columns": ["from_agent_id"], "isUnique": false },
+        "messages_status_idx": { "name": "messages_status_idx", "columns": ["status"], "isUnique": false }
+      },
+      "foreignKeys": {
+        "messages_from_agent_id_agents_id_fk": {
+          "name": "messages_from_agent_id_agents_id_fk",
+          "tableFrom": "messages",
+          "tableTo": "agents",
+          "columnsFrom": ["from_agent_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "mesh_state": {
+      "name": "mesh_state",
+      "columns": {
+        "id": { "name": "id", "type": "text", "primaryKey": true, "notNull": true },
+        "topology": { "name": "topology", "type": "text", "primaryKey": false, "notNull": true, "default": "'star'" },
+        "active_agents": { "name": "active_agents", "type": "integer", "primaryKey": false, "notNull": true, "default": 0 },
+        "total_messages": { "name": "total_messages", "type": "integer", "primaryKey": false, "notNull": true, "default": 0 },
+        "health_score": { "name": "health_score", "type": "real", "primaryKey": false, "notNull": true, "default": 1.0 },
+        "snapshot": { "name": "snapshot", "type": "text", "primaryKey": false, "notNull": false },
+        "created_at": { "name": "created_at", "type": "integer", "primaryKey": false, "notNull": true }
+      },
+      "indexes": {
+        "mesh_state_created_idx": { "name": "mesh_state_created_idx", "columns": ["created_at"], "isUnique": false }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
