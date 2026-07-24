@@ -44,3 +44,6 @@ Thumbs.db
 
 # ── TypeScript ────────────────────────────────────────────────────────────────
 *.tsbuildinfo
+
+# mTLS dev certificates
+certs/
