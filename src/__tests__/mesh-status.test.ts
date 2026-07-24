@@ -50,10 +50,9 @@ describe('/mesh/status endpoint', () => {
   it('default state reports healthy=true with zero agents', async () => {
     const res = await app.request('/mesh/status');
     const body = (await res.json()) as { agents: number; healthy: boolean };
-    // An empty mesh (0 agents) should report as healthy
-    if (body.agents === 0) {
-      expect(body.healthy).toBe(true);
-    }
+    // An empty mesh should report exactly zero agents and healthy=true.
+    expect(body.agents).toBe(0);
+    expect(body.healthy).toBe(true);
   });
 
   it('handles GET with query params and still returns valid shape', async () => {

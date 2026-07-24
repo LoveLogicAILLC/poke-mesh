@@ -19,7 +19,7 @@ CREATE TABLE `messages` (
   `to_agent_id`   TEXT,
   `type`          TEXT NOT NULL CHECK(`type` IN ('gossip', 'direct', 'heartbeat', 'discovery')),
   `payload`       TEXT NOT NULL,
-  `ttl`           INTEGER NOT NULL DEFAULT 3,
+  `ttl`           INTEGER NOT NULL DEFAULT 3 CHECK(`ttl` >= 0),
   `status`        TEXT NOT NULL DEFAULT 'pending' CHECK(`status` IN ('pending', 'delivered', 'expired', 'failed')),
   `created_at`    INTEGER NOT NULL
 );
@@ -38,4 +38,5 @@ CREATE TABLE `mesh_state` (
 CREATE INDEX `agents_status_idx`        ON `agents`(`status`);
 CREATE INDEX `messages_from_agent_idx`  ON `messages`(`from_agent_id`);
 CREATE INDEX `messages_status_idx`      ON `messages`(`status`);
+CREATE INDEX `messages_created_idx`     ON `messages`(`created_at`);
 CREATE INDEX `mesh_state_created_idx`   ON `mesh_state`(`created_at`);

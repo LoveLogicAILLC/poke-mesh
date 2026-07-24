@@ -2,14 +2,25 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { timing } from 'hono/timing';
+import { mtlsMiddleware } from './security/middleware';
+import { createMTLSConfig } from './security/mtls';
 import type { Env } from './types/env';
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env; Variables: { clientCertFingerprint: string } }>();
 
 // ── Middleware ─────────────────────────────
 app.use('*', logger());
 app.use('*', cors());
 app.use('*', timing());
+
+// ── mTLS enforcement ──────────────────────
+// Applied to state-changing agent + gossip routes so agents refuse plaintext
+// peers. The middleware is a pass-through in local dev (no Cloudflare `cf`
+// object present) and enforces client-cert validation on Cloudflare Workers.
+const mtlsConfig = createMTLSConfig();
+app.use('/agents/register', mtlsMiddleware(mtlsConfig));
+app.use('/agents/:id', mtlsMiddleware(mtlsConfig));
+app.use('/mesh/gossip', mtlsMiddleware(mtlsConfig));
 
 // ── Health ────────────────────────────────
 app.get('/health', (c) => {
@@ -33,7 +44,12 @@ app.get('/mesh/status', async (c) => {
   }
 
   if (cachedState) {
-    return c.json(JSON.parse(cachedState));
+    try {
+      return c.json(JSON.parse(cachedState));
+    } catch {
+      // Corrupt cache value — fall through to the computed default below
+      // rather than surfacing a 500.
+    }
   }
 
   return c.json({
@@ -47,7 +63,12 @@ app.get('/mesh/status', async (c) => {
 
 // ── Agent Registration ────────────────────
 app.post('/agents/register', async (c) => {
-  const body = await c.req.json();
+  let body: { name?: string; address?: string };
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
   const { name, address } = body;
 
   if (!name || !address) {
@@ -81,7 +102,11 @@ app.get('/agents', async (c) => {
 
 // ── Gossip Endpoint ───────────────────────
 app.post('/mesh/gossip', async (c) => {
-  await c.req.json();
+  try {
+    await c.req.json();
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400);
+  }
   // TODO: validate and propagate gossip message
   return c.json({ received: true, messageId: crypto.randomUUID() });
 });

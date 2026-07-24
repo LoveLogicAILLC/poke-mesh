@@ -17,10 +17,20 @@ export interface MTLSConfig {
   allowExpired: boolean;
 }
 
+/**
+ * Normalize a certificate fingerprint for comparison: lower-case and strip
+ * any non-hex separators (colons, spaces) so `AB:CD` and `abcd` compare equal.
+ */
+export function normalizeFingerprint(fp: string): string {
+  return fp.toLowerCase().replace(/[^a-f0-9]/g, '');
+}
+
 export function createMTLSConfig(opts?: Partial<MTLSConfig>): MTLSConfig {
+  const trusted = opts?.trustedFingerprints ?? new Set<string>();
   return {
     requireClientCert: opts?.requireClientCert ?? true,
-    trustedFingerprints: opts?.trustedFingerprints ?? new Set(),
+    // Normalize on the way in so trust comparisons are format-agnostic.
+    trustedFingerprints: new Set([...trusted].map(normalizeFingerprint)),
     allowExpired: opts?.allowExpired ?? false,
   };
 }
@@ -33,7 +43,8 @@ export function validateClientCert(
   certInfo:
     | {
         certPresented: string;
-        certFingerprint: string;
+        // Cloudflare exposes the SHA-256 fingerprint as `certFingerprintSHA256`.
+        certFingerprintSHA256: string;
         certNotBefore: string;
         certNotAfter: string;
       }
@@ -52,6 +63,11 @@ export function validateClientCert(
     const now = Date.now();
     const notBefore = new Date(certInfo.certNotBefore).getTime();
     const notAfter = new Date(certInfo.certNotAfter).getTime();
+    // Malformed date strings yield NaN, and every NaN comparison is false —
+    // which would silently pass an invalid cert. Reject those explicitly.
+    if (Number.isNaN(notBefore) || Number.isNaN(notAfter)) {
+      return { valid: false, reason: 'Client certificate has invalid validity dates' };
+    }
     if (now < notBefore || now > notAfter) {
       return { valid: false, reason: 'Client certificate expired or not yet valid' };
     }
@@ -59,7 +75,7 @@ export function validateClientCert(
 
   if (
     config.trustedFingerprints.size > 0 &&
-    !config.trustedFingerprints.has(certInfo.certFingerprint)
+    !config.trustedFingerprints.has(normalizeFingerprint(certInfo.certFingerprintSHA256))
   ) {
     return { valid: false, reason: 'Client certificate fingerprint not trusted' };
   }
