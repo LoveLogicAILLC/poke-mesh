@@ -9,7 +9,7 @@ import { type MTLSConfig, validateClientCert } from './mtls';
  */
 interface TlsClientAuth {
   certPresented: string;
-  certFingerprint: string;
+  certFingerprintSHA256: string;
   certNotBefore: string;
   certNotAfter: string;
 }
@@ -33,8 +33,8 @@ export function mtlsMiddleware(config: MTLSConfig) {
     }
 
     // Attach cert fingerprint to context for downstream use
-    if (certInfo?.certFingerprint) {
-      c.set('clientCertFingerprint', certInfo.certFingerprint);
+    if (certInfo?.certFingerprintSHA256) {
+      c.set('clientCertFingerprint', certInfo.certFingerprintSHA256);
     }
 
     await next();
