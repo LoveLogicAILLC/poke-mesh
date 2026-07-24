@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
-import { MeshTopology, type Agent, type TopologyType } from '../mesh/topology';
+import { beforeEach, describe, expect, it } from 'bun:test';
+import { type Agent, MeshTopology, type TopologyType } from '../mesh/topology';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ describe('MeshTopology — agent registration', () => {
     mesh.register(makeAgent({ id: 'a2', address: '10.0.0.2:4001' }));
     const agents = mesh.listAgents();
     expect(agents.length).toBe(2);
-    const ids = agents.map(a => a.id);
+    const ids = agents.map((a) => a.id);
     expect(ids).toContain('a1');
     expect(ids).toContain('a2');
   });
@@ -215,7 +215,7 @@ describe('MeshTopology — gossip message propagation (stubs)', () => {
   it('only healthy agents should be targeted for gossip', () => {
     mesh.register(makeAgent({ id: 'healthy-peer', healthy: true }));
     mesh.register(makeAgent({ id: 'dead-peer', healthy: false }));
-    const healthyPeers = mesh.listAgents().filter(a => a.healthy);
+    const healthyPeers = mesh.listAgents().filter((a) => a.healthy);
     expect(healthyPeers.length).toBe(1);
     expect(healthyPeers[0]?.id).toBe('healthy-peer');
   });
@@ -225,6 +225,6 @@ describe('MeshTopology — gossip message propagation (stubs)', () => {
     const agent = mesh.getAgent('a1');
     expect(agent?.address).toBeDefined();
     expect(typeof agent?.address).toBe('string');
-    expect(agent!.address.length).toBeGreaterThan(0);
+    expect((agent?.address ?? '').length).toBeGreaterThan(0);
   });
 });

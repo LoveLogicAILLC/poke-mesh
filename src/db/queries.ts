@@ -1,6 +1,6 @@
-import { eq, desc, and, lt } from "drizzle-orm";
-import type { Database } from "./index";
-import { agents, messages, meshState } from "./schema";
+import { and, desc, eq, lt } from 'drizzle-orm';
+import type { Database } from './index';
+import { agents, meshState, messages } from './schema';
 
 export async function registerAgent(db: Database, agent: typeof agents.$inferInsert) {
   return db.insert(agents).values(agent).returning();
@@ -9,13 +9,13 @@ export async function registerAgent(db: Database, agent: typeof agents.$inferIns
 export async function deregisterAgent(db: Database, agentId: string) {
   return db
     .update(agents)
-    .set({ status: "terminated", updatedAt: new Date() })
+    .set({ status: 'terminated', updatedAt: new Date() })
     .where(eq(agents.id, agentId))
     .returning();
 }
 
 export async function getActiveAgents(db: Database) {
-  return db.select().from(agents).where(eq(agents.status, "active"));
+  return db.select().from(agents).where(eq(agents.status, 'active'));
 }
 
 export async function getAgent(db: Database, agentId: string) {
@@ -34,7 +34,7 @@ export async function staleAgents(db: Database, thresholdMs: number) {
   return db
     .select()
     .from(agents)
-    .where(and(eq(agents.status, "active"), lt(agents.lastHeartbeat, cutoff)));
+    .where(and(eq(agents.status, 'active'), lt(agents.lastHeartbeat, cutoff)));
 }
 
 export async function insertMessage(db: Database, message: typeof messages.$inferInsert) {

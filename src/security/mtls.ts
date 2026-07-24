@@ -38,14 +38,14 @@ export function validateClientCert(
         certNotAfter: string;
       }
     | undefined,
-  config: MTLSConfig
+  config: MTLSConfig,
 ): { valid: boolean; reason?: string } {
   if (!config.requireClientCert) {
     return { valid: true };
   }
 
-  if (!certInfo || certInfo.certPresented !== "1") {
-    return { valid: false, reason: "No client certificate presented" };
+  if (!certInfo || certInfo.certPresented !== '1') {
+    return { valid: false, reason: 'No client certificate presented' };
   }
 
   if (!config.allowExpired) {
@@ -53,7 +53,7 @@ export function validateClientCert(
     const notBefore = new Date(certInfo.certNotBefore).getTime();
     const notAfter = new Date(certInfo.certNotAfter).getTime();
     if (now < notBefore || now > notAfter) {
-      return { valid: false, reason: "Client certificate expired or not yet valid" };
+      return { valid: false, reason: 'Client certificate expired or not yet valid' };
     }
   }
 
@@ -61,7 +61,7 @@ export function validateClientCert(
     config.trustedFingerprints.size > 0 &&
     !config.trustedFingerprints.has(certInfo.certFingerprint)
   ) {
-    return { valid: false, reason: "Client certificate fingerprint not trusted" };
+    return { valid: false, reason: 'Client certificate fingerprint not trusted' };
   }
 
   return { valid: true };
@@ -71,8 +71,8 @@ export function validateClientCert(
  * Generate a SHA-256 fingerprint from raw bytes (for comparing certs).
  */
 export async function sha256Fingerprint(data: ArrayBuffer): Promise<string> {
-  const hash = await crypto.subtle.digest("SHA-256", data);
+  const hash = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join(":");
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join(':');
 }

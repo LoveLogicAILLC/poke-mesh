@@ -1,5 +1,5 @@
-import app from "./app";
-import type { Env } from "./types/env";
+import app from './app';
+import type { Env } from './types/env';
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {

@@ -37,7 +37,7 @@ export class MeshTopology {
 
   isHealthy(): boolean {
     if (this.agents.size === 0) return true;
-    const healthyCount = Array.from(this.agents.values()).filter(a => a.healthy).length;
+    const healthyCount = Array.from(this.agents.values()).filter((a) => a.healthy).length;
     return healthyCount / this.agents.size >= 0.5;
   }
 

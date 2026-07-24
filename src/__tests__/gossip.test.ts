@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
-import { GossipProtocol, type GossipMessage } from '../mesh/gossip';
+import { beforeEach, describe, expect, it } from 'bun:test';
+import { type GossipMessage, GossipProtocol } from '../mesh/gossip';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

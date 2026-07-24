@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import app from '../app';
 
 describe('/health endpoint', () => {
@@ -14,7 +14,7 @@ describe('/health endpoint', () => {
 
   it('response body has the correct shape {service, status, version}', async () => {
     const res = await app.request('/health');
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     expect(body).toHaveProperty('service');
     expect(body).toHaveProperty('status');
     expect(body).toHaveProperty('version');
@@ -22,19 +22,19 @@ describe('/health endpoint', () => {
 
   it('service is "poke-mesh"', async () => {
     const res = await app.request('/health');
-    const body = await res.json() as { service: string };
+    const body = (await res.json()) as { service: string };
     expect(body.service).toBe('poke-mesh');
   });
 
   it('status is "ok"', async () => {
     const res = await app.request('/health');
-    const body = await res.json() as { status: string };
+    const body = (await res.json()) as { status: string };
     expect(body.status).toBe('ok');
   });
 
   it('version matches semver pattern (e.g. 0.1.0)', async () => {
     const res = await app.request('/health');
-    const body = await res.json() as { version: string };
+    const body = (await res.json()) as { version: string };
     // Semver: major.minor.patch with optional pre-release/build metadata
     const semverPattern = /^\d+\.\d+\.\d+(-[\w.]+)?(\+[\w.]+)?$/;
     expect(body.version).toMatch(semverPattern);
@@ -42,7 +42,7 @@ describe('/health endpoint', () => {
 
   it('response body contains no extra unexpected fields', async () => {
     const res = await app.request('/health');
-    const body = await res.json() as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, unknown>;
     const keys = Object.keys(body);
     expect(keys).toContain('service');
     expect(keys).toContain('status');
@@ -54,7 +54,7 @@ describe('/health endpoint', () => {
   it('handles GET with query params and still returns 200', async () => {
     const res = await app.request('/health?verbose=true&ts=12345');
     expect(res.status).toBe(200);
-    const body = await res.json() as { service: string; status: string };
+    const body = (await res.json()) as { service: string; status: string };
     expect(body.service).toBe('poke-mesh');
     expect(body.status).toBe('ok');
   });
